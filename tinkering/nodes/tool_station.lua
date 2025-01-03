@@ -310,6 +310,7 @@ local function handle_take_output(pos, listname)
 					end
 				end
 
+
 				if not repair then
 					inv:set_list(listname, take_from_list(list, tool:get_name(), for_removal))
 				end
