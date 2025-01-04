@@ -25,8 +25,8 @@ end
 local function get_template_group(groups)
 	if not groups then return nil end
 	for g,i in pairs(groups) do
-		if g:find("tc_") == 1 then
-			return g:gsub("^tc_", "")
+		if g:match("^tc_.*_pattern$") then
+			return g:gsub("^tc_", ""):gsub("_pattern$", "")
 		end
 	end
 	return nil

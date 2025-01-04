@@ -154,12 +154,16 @@ function metal_caster.get_cast_for(item)
 	local cast = nil
 	local typename = nil
 
-	for metal, types in pairs(fluidity.melts) do
-		if typename ~= nil then break end
-		for t, items in pairs(types) do
-			if in_table(items, item) then
-				typename = t
-				break
+	if item == "default:clay_brick" or item == "metal_melter:heated_brick" then
+		typename = "ingot"
+	else
+		for metal, types in pairs(fluidity.melts) do
+			if typename ~= nil then break end
+			for t, items in pairs(types) do
+				if in_table(items, item) then
+					typename = t
+					break
+				end
 			end
 		end
 	end

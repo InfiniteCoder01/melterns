@@ -7,11 +7,20 @@ function tinkering.register_pattern(name, data)
 
 	tinkering.patterns[name] = data
 
-	minetest.register_craftitem(mod..":"..name.."_pattern", {
+	local itemname = mod..":"..name.."_pattern"
+	core.register_craftitem(itemname, {
 		description     = desc.." Pattern\n\nMaterial Cost: "..data.cost,
 		inventory_image = "tinkering_"..name.."_pattern.png",
-		groups          = {tinker_pattern=1, ["tc_"..name] = 1}
+		groups          = {tinker_pattern=1, ["tc_"..name.."_pattern"] = 1}
 	})
+
+	if i3 and i3.register_craft then
+		i3.register_craft {
+			type   = "tinkering:pattern_creating",
+			result = itemname,
+			items  = {"tinkering:blank_pattern"},
+		}
+	end
 end
 
 -- Create blank pattern

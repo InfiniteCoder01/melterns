@@ -85,6 +85,20 @@ function tinkering.create_material_component(data)
 		groups          = groups,
 		inventory_image = data.image
 	})
+
+	if i3 and i3.register_craft then
+		local iv = tinkering.materials[data.metal]
+		if not iv.cast then
+			local material = iv.base == "group" and ("group:"..iv.default) or iv.default
+
+			i3.register_craft {
+				type   = "tinkering:part_building",
+				result = mod..":"..name,
+				items  = {"group:tc_"..data.component.."_pattern", material},
+
+			}
+		end
+	end
 end
 
 -- Register a tool type

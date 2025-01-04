@@ -3,6 +3,7 @@
 
 -- This mod is currently stuck behind https://github.com/minetest/minetest/issues/5686
 -- Once this gets implemented, the full abilities of this mod will be available.
+-- Implemented, what now?
 
 tinkering = rawget(_G, "tinkering") or {}
 

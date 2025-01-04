@@ -31,3 +31,54 @@ dofile(modpath.."/melter.lua")
 
 -- Caster
 dofile(modpath.."/caster.lua")
+
+core.register_on_mods_loaded(function()
+	if i3 and i3.register_craft_type then
+		i3.register_craft_type("metal_melter:casting", {
+			description = "Casting using Metal Caster",
+			icon = "caster_front.png",
+		})
+
+		if i3.register_craft then
+			-- Recipies for casts
+			for name, cast in pairs(metal_caster.casts) do
+				for metal, types in pairs(fluidity.melts) do
+					if types[name] then
+						for _, item in ipairs(types[name]) do
+							i3.register_craft {
+								type   = "metal_melter:casting",
+								result = (cast.mod_name or "metal_melter")..":"..name.."_cast",
+								items  = {item},
+							}
+						end
+					end
+				end
+			end
+			i3.register_craft {
+				type   = "metal_melter:casting",
+				result ="metal_melter:ingot_cast",
+				items  = {"default:clay_brick"},
+			}
+			i3.register_craft {
+				type   = "metal_melter:casting",
+				result ="metal_melter:ingot_cast",
+				items  = {"metal_melter:heated_brick"},
+			}
+
+			-- Recipies for items out of casts
+			for metal, types in pairs(fluidity.melts) do
+				if fluidity.molten_metals[metal] then
+					for	type, items in pairs(types) do
+						if items[1] and items[1] ~= "" and metal_caster.casts[type] then
+							i3.register_craft {
+								type   = "metal_melter:casting",
+								result = items[1],
+								items  = {fluidity.molten_metals[metal], (metal_caster.casts[type].mod_name or "metal_melter")..":"..type.."_cast"},
+							}
+						end
+					end
+				end
+			end
+		end
+	end
+end)
