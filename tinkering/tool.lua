@@ -299,7 +299,7 @@ function tinkering.tool_definition(tool_type, materials)
 	local tool_tree = {
 		description       = name,
 		tool_capabilities = capabilities,
-		groups            = {tinker_tool = 1, ["mainly_"..materials.main] = 1, ["tinker_"..tool_type] = 1, not_in_creative_inventory = 1},
+		groups            = {tinker_tool = 1, ["mainly_"..materials.main] = 1, ["tinker_"..tool_type] = 1},
 		after_use         = after_use_handler,
 		_is_broken        = false,
 		inventory_image   = tinkering.compose_tool_texture(tool_type, materials.main, materials.rod)
@@ -368,7 +368,23 @@ function tinkering.create_tool(tool_type, materials, want_tool, custom_name, ove
 		tool_def_broken.after_use = nil
 		tool_def_broken._is_broken = true
 		tool_def_broken._unbroken_name = internal_name
+		tool_def_broken.groups.not_in_creative_inventory = 1
 		minetest.register_tool(internal_name.."_broken", tool_def_broken)
+
+		if i3 and i3.register_craft then
+			print(core.serialize(tool_data.components), core.serialize(materials))
+			local components = {}
+			for name, component in pairs(tool_data.components) do
+				local material = name == "main" and (mod_name..":"..materials.main) or "group:tc"
+				table.insert(components, material.."_"..component)
+			end
+			i3.register_craft {
+				type   = "tinkering:tool_creating",
+				result = internal_name,
+				items  = components,
+
+			}
+		end
 	end
 
 	if not want_tool then return nil end
@@ -476,3 +492,4 @@ function tinkering.register_component(name, data)
 		fluidity.register_melt(mod..":"..component, m, name)
 	end
 end
+--

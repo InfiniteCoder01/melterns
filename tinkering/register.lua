@@ -14,6 +14,11 @@ if i3 and i3.register_craft_type then
 		description = "Part Building",
 		icon = "tinkering_tool_binding_pattern.png",
 	})
+
+	i3.register_craft_type("tinkering:tool_creating", {
+		description = "Makign tools in Tool Station",
+		icon = "default_tool_steelpick.png",
+	})
 end
 
 -- Create base tools
