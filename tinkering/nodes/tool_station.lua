@@ -102,10 +102,10 @@ function tool_station.get_types(list, tool_type)
 		local stack_name = stack:get_name()
 		for tt, ty in pairs(tool.components) do
 			if not result then break end
-			local in_grp = minetest.get_item_group(stack_name, "tc_"..ty) > 0
+			local in_grp = core.get_item_group(stack_name, "tc_"..ty) > 0
 			if in_grp then
 				if components[tt] == nil then
-					local mtg = get_metalgroup(minetest.registered_items[stack_name].groups)
+					local mtg = get_metalgroup(core.registered_items[stack_name].groups)
 					if mtg ~= nil then
 						result[tt] = mtg
 						
@@ -135,7 +135,7 @@ function tool_station.get_tool(list)
 	local tool_type = nil
 	for _,stack in pairs(list) do
 		local stack_name = stack:get_name()
-		if minetest.get_item_group(stack_name, "tinker_tool") > 0 then
+		if core.get_item_group(stack_name, "tinker_tool") > 0 then
 			if tool_fnd == nil then
 				local itemdef = stack:get_definition()
 				if itemdef._is_broken then
@@ -145,12 +145,12 @@ function tool_station.get_tool(list)
 					meta:from_table(broken_stack:get_meta():to_table())
 					meta:set_string("description", meta:get_string("description_non_broken"))
 					meta:set_string("description_non_broken", "")
-					meta:set_tool_capabilities(minetest.deserialize(meta:get_string("capabilities_non_broken"), true))
+					meta:set_tool_capabilities(core.deserialize(meta:get_string("capabilities_non_broken"), true))
 					meta:set_string("capabilities_non_broken", "")
 					stack:set_wear(65535)
 				end
 				for t in pairs(tinkering.tools) do
-					if minetest.get_item_group(stack_name, "tinker_"..t) > 0 then
+					if core.get_item_group(stack_name, "tinker_"..t) > 0 then
 						tool_type = t
 						break
 					end
@@ -188,7 +188,7 @@ local function find_material(stack)
 
 	-- Grouped
 	for mat,iv in pairs(tinkering.materials) do
-		if iv.base == "group" and minetest.get_item_group(stack, iv.default) > 0 then
+		if iv.base == "group" and core.get_item_group(stack, iv.default) > 0 then
 			return mat, "block"
 		elseif stack == iv.default then
 			return mat, "ingot"
@@ -255,7 +255,7 @@ local function take_from_list(list, item, list2)
 end
 
 local function handle_take_output(pos, listname)
-	local meta = minetest.get_meta(pos)
+	local meta = core.get_meta(pos)
 	local inv  = meta:get_inventory()
 
 	local tooltype = meta:get_string("tool_type")
@@ -313,6 +313,7 @@ local function handle_take_output(pos, listname)
 
 				if not repair then
 					inv:set_list(listname, take_from_list(list, tool:get_name(), for_removal))
+					if awards and awards["notify_tinkering:tool_creation"] then awards["notify_tinkering:tool_creation"](player, tool:get_name()) end
 				end
 
 				if tool:get_wear() ~= 0 and repair then
@@ -356,7 +357,7 @@ local function handle_take_output(pos, listname)
 end
 
 local function on_timer(pos, elapsed)
-	local meta    = minetest.get_meta(pos)
+	local meta    = core.get_meta(pos)
 	local inv     = meta:get_inventory()
 	local refresh = false
 
@@ -457,7 +458,7 @@ local function on_timer(pos, elapsed)
 end
 
 local function allow_metadata_inventory_put (pos, listname, index, stack, player)
-	if minetest.is_protected(pos, player:get_player_name()) then
+	if core.is_protected(pos, player:get_player_name()) then
 		return 0
 	end
 
@@ -469,14 +470,14 @@ local function allow_metadata_inventory_put (pos, listname, index, stack, player
 end
 
 local function allow_metadata_inventory_move (pos, from_list, from_index, to_list, to_index, count, player)
-	local meta = minetest.get_meta(pos)
+	local meta = core.get_meta(pos)
 	local inv = meta:get_inventory()
 	local stack = inv:get_stack(from_list, from_index)
 	return allow_metadata_inventory_put(pos, to_list, to_index, stack, player)
 end
 
 local function allow_metadata_inventory_take (pos, listname, index, stack, player)
-	if minetest.is_protected(pos, player:get_player_name()) then
+	if core.is_protected(pos, player:get_player_name()) then
 		return 0
 	end
 
@@ -484,7 +485,7 @@ local function allow_metadata_inventory_take (pos, listname, index, stack, playe
 end
 
 local function on_construct(pos)
-	local meta = minetest.get_meta(pos)
+	local meta = core.get_meta(pos)
 	meta:set_string("formspec", tool_station.get_formspec())
 	
 	-- Create inventory
@@ -497,27 +498,27 @@ local function on_construct(pos)
 end
 
 local function on_take(pos, listname, index, stack, player)
-	local inv = minetest.get_meta(pos):get_inventory()
+	local inv = core.get_meta(pos):get_inventory()
 
 	if listname == "output" then
 		handle_take_output(pos, "input")
 	end
 
-	minetest.get_node_timer(pos):start(0.02)
+	core.get_node_timer(pos):start(0.02)
 end
 
 local function can_dig(pos, player)
-	local meta = minetest.get_meta(pos)
+	local meta = core.get_meta(pos)
 	local inv = meta:get_inventory()
 	return inv:is_empty("input") and inv:is_empty("output")
 end
 
 local function on_receive_fields(pos, formname, fields, sender)
-	if sender and minetest.is_protected(pos, sender:get_player_name()) then
+	if sender and core.is_protected(pos, sender:get_player_name()) then
 		return 0
 	end
 
-	local meta = minetest.get_meta(pos)
+	local meta = core.get_meta(pos)
 	if fields["anvil"] then
 		meta:set_string("tool_type", "")
 	else
@@ -529,10 +530,10 @@ local function on_receive_fields(pos, formname, fields, sender)
 		end
 	end
 
-	minetest.get_node_timer(pos):start(0.02)
+	core.get_node_timer(pos):start(0.02)
 end
 
-minetest.register_node("tinkering:tool_station", {
+core.register_node("tinkering:tool_station", {
 	description = "Tool Station",
 	tiles = {
 		"tinkering_workbench_top.png", "tinkering_bench_bottom.png",
@@ -554,10 +555,10 @@ minetest.register_node("tinkering:tool_station", {
 	on_receive_fields = on_receive_fields,
 
 	on_metadata_inventory_move = function(pos)
-		minetest.get_node_timer(pos):start(0.05)
+		core.get_node_timer(pos):start(0.05)
 	end,
 	on_metadata_inventory_put = function(pos)
-		minetest.get_node_timer(pos):start(0.05)
+		core.get_node_timer(pos):start(0.05)
 	end,
 	on_metadata_inventory_take = on_take,
 
@@ -567,3 +568,15 @@ minetest.register_node("tinkering:tool_station", {
 
 	groups = {choppy = 2, oddly_breakable_by_hand = 2}
 })
+
+if awards and awards.register_trigger then
+	awards.register_trigger("tinkering:tool_creation", {
+		type = "counted_key",
+		key_is_item = true,
+		progress = "@1/@2 tools made",
+		auto_description = { "Make a tool in tool station", "Make @1 tools in a tool station" },
+		get_key = function(self, def)
+			return minetest.registered_aliases[def.trigger.tool] or def.trigger.tool
+		end,
+	})
+end

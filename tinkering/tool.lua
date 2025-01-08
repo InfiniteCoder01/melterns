@@ -16,7 +16,7 @@ tinkering.tools = {
 	},
 	axe = {
 		description = "Axe",
-		groups = {"choppy"},
+		groups = {"choppy", "axe"},
 		fleshy_increment = 1,
 		components = {
 			main    = "axe_head",
@@ -299,7 +299,7 @@ function tinkering.tool_definition(tool_type, materials)
 	local tool_tree = {
 		description       = name,
 		tool_capabilities = capabilities,
-		groups            = {tinker_tool = 1, ["mainly_"..materials.main] = 1, ["tinker_"..tool_type] = 1},
+		groups            = {tinker_tool = 1, ["mainly_"..materials.main] = 1, [tool_type] = 1, ["tinker_"..tool_type] = 1},
 		after_use         = after_use_handler,
 		_is_broken        = false,
 		inventory_image   = tinkering.compose_tool_texture(tool_type, materials.main, materials.rod)
@@ -372,7 +372,6 @@ function tinkering.create_tool(tool_type, materials, want_tool, custom_name, ove
 		minetest.register_tool(internal_name.."_broken", tool_def_broken)
 
 		if i3 and i3.register_craft then
-			print(core.serialize(tool_data.components), core.serialize(materials))
 			local components = {}
 			for name, component in pairs(tool_data.components) do
 				local material = name == "main" and (mod_name..":"..materials.main) or "group:tc"
