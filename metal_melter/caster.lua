@@ -73,6 +73,19 @@ local function get_bucket_for_fluid(src)
 	return bucket.itemname
 end
 
+local function get_fluid_for_bucket(itemname)
+	local found = nil
+
+	for source, b in pairs(bucket.liquids) do
+		if b.itemname and b.itemname == itemname then
+			found = b.source
+			break
+		end
+	end
+
+	return found
+end
+
 local function allow_metadata_inventory_put (pos, listname, index, stack, player)
 	if minetest.is_protected(pos, player:get_player_name()) then
 		return 0
@@ -266,7 +279,7 @@ local function caster_node_timer(pos, elapsed)
 				refresh = true
 			end
 		else
-			local bucket_fluid = bucket.get_liquid_for_bucket(bucket_name)
+			local bucket_fluid = get_fluid_for_bucket(bucket_name)
 			local fluid_is_metal = fluidity.get_metal_for_fluid(bucket_fluid) ~= nil
 			local empty_bucket = false
 
