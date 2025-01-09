@@ -254,7 +254,7 @@ local function take_from_list(list, item, list2)
 	return list
 end
 
-local function handle_take_output(pos, listname)
+local function handle_take_output(player, pos, listname)
 	local meta = core.get_meta(pos)
 	local inv  = meta:get_inventory()
 
@@ -285,6 +285,7 @@ local function handle_take_output(pos, listname)
 			end
 		end
 
+		if awards and awards["notify_tinkering:tool_creation"] then awards["notify_tinkering:tool_creation"](player, inv:get_list("output")[1]:get_name()) end
 		inv:set_list(listname, list)
 	else
 		local tool, tool_type_ = tool_station.get_tool(list)
@@ -313,7 +314,6 @@ local function handle_take_output(pos, listname)
 
 				if not repair then
 					inv:set_list(listname, take_from_list(list, tool:get_name(), for_removal))
-					if awards and awards["notify_tinkering:tool_creation"] then awards["notify_tinkering:tool_creation"](player, tool:get_name()) end
 				end
 
 				if tool:get_wear() ~= 0 and repair then
@@ -501,7 +501,7 @@ local function on_take(pos, listname, index, stack, player)
 	local inv = core.get_meta(pos):get_inventory()
 
 	if listname == "output" then
-		handle_take_output(pos, "input")
+		handle_take_output(player, pos, "input")
 	end
 
 	core.get_node_timer(pos):start(0.02)
